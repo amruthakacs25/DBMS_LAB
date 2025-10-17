@@ -1,0 +1,62 @@
+show databases;
+create database new_bank;
+use new_bank;
+create table branch1(b_name varchar(50) primary key,b_city varchar(50),assets decimal(15.0));
+create table b_account(acc_no int primary key,b_name varchar(50),balance decimal(15.2),foreign key(b_name) references branch1(b_name));
+create table b_customer(c_name varchar(50) primary key,c_strees varchar(100),city varchar(50));
+create table deposit(c_name varchar(50),acc_no int, primary key(c_name,acc_no),foreign key(c_name) references b_customer(c_name) on delete cascade on update cascade, foreign key(acc_no) references b_account(acc_no));
+create table loan(l_number int primary key,b_name varchar(50),amount decimal(15.2),foreign key(b_name) references branch1(b_name));
+desc branch1;
+desc b_account;
+desc b_customer;
+desc deposit;
+desc loan;
+insert into branch1 values("sbi_chamarajapete","Bangalore",50000);
+insert into branch1 values("sbi_redidency_road","Bangalore",10000);
+insert into branch1 values("sbi_shivaji_road","Bangalore",20000);
+insert into branch1 values("sbi_delhi","Delhi",10000);
+insert into branch1 values("sbi_jantarmantar","hyderabad",50000);
+select * from branch1;
+insert into b_account values(1,"sbi_chamarajapete",20000);
+insert into b_account values(2,"sbi_redidency_road",50000);
+insert into b_account values(3,"sbi_shivaji_road",60000);
+insert into b_account values(4,"sbi_delhi",90000);
+insert into b_account values(5,"sbi_jantarmantar",50000);
+select * from b_account;
+insert into b_customer values("aninash","bull_temple_road","Bangalore");
+insert into b_customer values("dinesh","banbergatta_road","Bangalore");
+insert into b_customer values("mohan","national_college","Bangalore");
+insert into b_customer values("nikil","akbar_road","Delhi");
+insert into b_customer values("ravi","prithuiraj_road","Delhi");
+insert into deposit values("aninash",1);
+insert into deposit values("dinesh",2);
+insert into deposit values("mohan",3);
+insert into deposit values("nikil",4);
+insert into deposit values("ravi",5);
+select * from deposit;
+insert into loan values(1,"sbi_chamarajapete",10000);
+insert into loan values(2,"sbi_redidency_road",20000);
+insert into loan values(3,"sbi_shivaji_road",30000);
+insert into loan values(4,"sbi_delhi",40000);
+insert into loan values(5,"sbi_jantarmantar",50000);
+select * from loan;
+select b_name,(assets/300) as "assets in lakhs" from branch1;
+create view b_loan_sum as select b_name,sum(amount) as total_amount from loan group by b_name;
+select * from b_loan_sum;
+select * from branch1;
+select distinct d.c_name from deposit d join b_account b on d.acc_no=b.acc_no join branch1 br on b.b_name=br.b_name where br.b_city="delhi";
+select distinct bc. c_name from b_customer bc where bc.c_name not in(select c_name from deposit) and bc.c_name in(select distinct bc2.c_name from b_customer bc2,loan l,branch1 br where l.b_name=br.b_name);
+select b_name from branch1 where assets>all(select assets from bramch1 where b_city="bangalore");
+delete from b_account where b_name in(select b_name from branch1 where b_city="delhi");
+select * from n_customer;
+update b_account set balance=balance+(balance*0.5) where b_name="sbi_shivaji_road";
+select * from b_account;
+
+
+select d.c_name,a.b_name from deposit d join b_account a on d.acc_no=a.acc_no group by d.c_name having count(d.acc_no)>=2;
+select d.c_name,b.b_name,count(*) as no_of_accounts from deposit d join b_account b on d.acc_no=b.acc_no group by d.c_name,b.b_name having count(*) >=2 and b.b_name="sbi_shivaji_road";
+
+
+
+
+
