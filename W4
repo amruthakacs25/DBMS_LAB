@@ -1,0 +1,52 @@
+1-SELECT D.customer_name
+FROM depositor D
+WHERE NOT EXISTS (
+    SELECT B.branch_name
+    FROM branch B
+    WHERE B.branch_city = 'Delhi'
+    AND NOT EXISTS (
+        SELECT A.account_number
+        FROM account A
+        WHERE A.branch_name = B.branch_name
+        AND A.account_number IN (
+            SELECT A1.account_number
+            FROM depositor A1
+            WHERE A1.customer_name = D.customer_name
+        )
+    )
+);
+
+2-SELECT DISTINCT borrower.customer_name
+FROM borrower
+WHERE borrower.customer_name NOT IN (
+    SELECT depositor.customer_name FROM depositor
+);
+
+3-SELECT DISTINCT D.customer_name
+FROM depositor D, account A
+WHERE D.account_number = A.account_number
+AND A.branch_name = 'Bangalore'
+AND D.customer_name IN (
+    SELECT B.customer_name
+    FROM borrower B, loan L
+    WHERE B.loan_number = L.loan_number
+    AND L.branch_name = 'Bangalore'
+);
+
+4-SELECT branch_name
+FROM branch
+WHERE assets > ALL (
+    SELECT assets
+    FROM branch
+    WHERE branch_city = 'Bangalore'
+);
+
+5-DELETE FROM account
+WHERE branch_name IN (
+    SELECT branch_name
+    FROM branch
+    WHERE branch_city = 'Bombay'
+);
+
+6-UPDATE account
+SET balance = balance * 1.05;
