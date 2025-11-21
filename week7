@@ -1,0 +1,34 @@
+create database supplier;
+use suppier;
+create table supplier(s_id int primary key,s_name varchar(50),city varchar(50));
+create table parts(p_id int primary key,p_name varchar(50),color varchar(20));
+create table catalog(s_id int,p_id int,cost int,primary key(s_id,p_id),foreign key(s_id) references supplier(s_id),foreign key(p_id) references parts(p_id));
+insert into supplier values(101,'anu','bangalore');
+insert into supplier values(102,'arun','mysore');
+insert into supplier values(103,'aniketh','kolkata');
+insert into supplier values(104,'ramu','delhi');
+insert into parts values(201,'book','red');
+insert into parts values(202,'pen','red');
+insert into parts values(203,'pencil','green');
+insert into parts values(204,'mobile','black');
+insert into catalog values(101,201,10);
+insert into catalog values(103,202,10);
+insert into catalog values(102,203,30);
+insert into catalog values(104,204,50);
+select * from supplier;
+select * from parts;
+select * from catalog;
+
+select distinct p.p_name from parts p join catalog c on p.p_id=c.p_id;
+
+select s.s_name from supplier s where not exists(select * from parts p where not exists(select * from catalog c where c.s_id=s.s_id and c.p_id=p.p_id));
+
+select s.s_name from supplier s where not exists(select * from parts p where p.color='red' and not exists(select * from catalog c where c.s_id=s.s_id and c.p_id=p.p_id));
+
+select p.p_name from parts p join catalog c on p.p_id=c.p_id join supplier s on s.s_id=c.s_id where s.s_name='aniketh' and p.p_id not in(select p_id from catalog where s_id<>(select s_id from supplier where s_name='aniketh'));
+
+select distinct c.s_id from catalog c where c.cost>(select avg(c2.cost)from catalog c2 where c2.p_id=c.p_id);
+
+select p.p_name,s.s_name from parts p join catalog c on p.p_id=c.p_id join supplier s on s.s_id=c.s_id where c.cost=(select max(c2.cost) from catalog c2 where c2.p_id=p.p_id);
+
+
